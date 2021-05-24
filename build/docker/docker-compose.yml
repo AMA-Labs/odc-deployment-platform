@@ -1,0 +1,42 @@
+version: '3.7'
+services:
+  notebooks:
+    image: ${NBK_BASE_IMG}
+    environment:
+      NBK_SERVER_PASSWORD: ${NBK_SERVER_PASSWORD}
+      ODC_DB_HOSTNAME: odc_training_db
+      ODC_DB_DATABASE: ${ODC_DB_DATABASE}
+      ODC_DB_USER: ${ODC_DB_USER}
+      ODC_DB_PASSWORD: ${ODC_DB_PASSWORD}
+      # AWS env vars for loading data from S3.
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REQUEST_PAYER: requester
+    ports:
+      # 8888 is the Jupyter notebook default port
+      - ${HOST_PORT}:8888
+    volumes:
+      - ${DKR_CMP_CONTEXT}/notebooks:${NOTEBOOK_ROOT}
+    restart: "no"
+  indexer:
+    image: ${IDXR_INIT_BASE_IMG}
+    environment:
+      ODC_DB_HOSTNAME: odc_training_db
+      ODC_DB_DATABASE: ${ODC_DB_DATABASE}
+      ODC_DB_USER: ${ODC_DB_USER}
+      ODC_DB_PASSWORD: ${ODC_DB_PASSWORD}
+      ODC_DB_PORT: ${ODC_DB_PORT}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+  odc_training_db:
+    image: ${DB_BASE_IMG}
+    environment:
+      - POSTGRES_DB=${ODC_DB_DATABASE}
+      - POSTGRES_USER=${ODC_DB_USER}
+      - POSTGRES_PASSWORD=${ODC_DB_PASSWORD}
+      - N=1000
+    volumes:
+      - odc-training-db-vol:/var/lib/postgresql/data
+volumes:
+  odc-training-db-vol:
+    external: true
