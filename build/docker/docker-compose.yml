@@ -1,7 +1,13 @@
 version: '3.7'
 services:
   notebooks:
-    image: ${NBK_BASE_IMG}
+    image: ${NBK_OUT_IMG}
+    build:
+      context: ${DKR_CMP_CONTEXT}
+      dockerfile: build/docker/Dockerfile
+      args:
+        - BASE_IMG=${NBK_BASE_IMG}
+        - NOTEBOOK_ROOT=${NOTEBOOK_ROOT}
     environment:
       NBK_SERVER_PASSWORD: ${NBK_SERVER_PASSWORD}
       ODC_DB_HOSTNAME: odc_training_db

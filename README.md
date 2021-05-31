@@ -1,8 +1,8 @@
-# CEOS Open Data Cube Training
+# Open Data Cube Training
 
-The CEOS Open Data Cube Training environment is a [Jupyter Notebook Environment](https://jupyter.org/) that uses the [Open Data Cube](https://www.opendatacube.org/) to analyze satellite data.
+The AMA ([Analytical Mechanics Associates](https://www.ama-inc.com/)) Open Data Cube Training environment is a [Jupyter Notebook Environment](https://jupyter.org/) that uses the [Open Data Cube](https://www.opendatacube.org/) to analyze satellite data.
 
-Each user should receive their own exclusive (not shared) training environment.
+Each user should receive their own exclusive (not shared) training environment. Each user's server will be created from a clone of this repository.
 
 ## Contents
 

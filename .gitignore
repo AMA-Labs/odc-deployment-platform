@@ -1,1 +1,13 @@
 **/notebook_server_logs.txt
+.idea
+.ipynb_checkpoints
+nohup.out
+dask-worker-space
+__pycache__
+*.nc
+*.tif
+*.tar.gz
+*.gif
+*.pkl
+**/tmp
+**/output

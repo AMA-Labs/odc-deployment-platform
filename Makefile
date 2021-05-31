@@ -72,19 +72,21 @@ restart-no-build: down up-no-build
 # List the running containers.
 ps:
 	$(docker_compose) ps
+## End Common ##
 
+## Notebooks ##
 # Start an interactive shell to the notebooks container.
 notebooks-ssh:
 	$(docker_compose) exec notebooks bash
+## End Notebooks ##
 
+## Indexer ##
 # Start an interactive shell to the indexer container.
 indexer-ssh:
 	$(docker_compose) exec indexer bash
-
-## End Common ##
+## End Indexer ##
 
 ## Database ##
-
 db-ssh:
 	$(docker_compose) exec odc_training_db bash
 
@@ -98,7 +100,18 @@ delete-odc-db-volume:
 
 recreate-odc-db-volume: delete-odc-db-volume create-odc-db-volume
 
+start-odc-db:
+	docker start docker_odc_training_db_1
+
+stop-odc-db:
+	docker stop docker_odc_training_db_1
+
+restart-odc-db: stop-odc-db start-odc-db
+
+recreate-odc-db-and-vol: down dkr-sys-prune recreate-odc-db-volume up-no-build
+
 restore-db:
+#	Restore index database
 	$(docker_compose) exec indexer conda run -n odc bash -c \
 	  "gzip -dkf db_dump.gz"
 	$(docker_compose) exec indexer conda run -n odc bash -c \
@@ -111,5 +124,12 @@ restore-db:
          -U ${ODC_DB_USER} ${ODC_DB_DATABASE} < db_dump &> restore.txt"
 	$(docker_compose) exec indexer conda run -n odc bash -c \
 	  "rm db_dump.gz"
-
+#	Restore data
+	$(docker_compose) exec indexer conda run -n odc bash -c \
+	  "tar -xzf /Datacube/data.tar.gz -C /Datacube/data"
 ## End Database ##
+
+## Misc ##
+dkr-sys-prune:
+	yes | docker system prune
+## End Misc ##
