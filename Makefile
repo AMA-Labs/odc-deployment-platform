@@ -18,56 +18,64 @@ docker_compose = docker-compose --project-directory build/docker -f build/docker
 ODC_VER?=1.8.3
 
 ## Notebooks ##
-NBK_BASE_IMG_REPO?=jcrattzama/data_cube_notebooks
-NBK_BASE_IMG_VER?=
-export NBK_BASE_IMG?=${NBK_BASE_IMG_REPO}:odc${ODC_VER}${NBK_BASE_IMG_VER}
-NBK_OUT_IMG_REPO?=jcrattzama/odc_training_notebooks
-NBK_OUT_IMG_VER?=
-export NBK_OUT_IMG?=${NBK_OUT_IMG_REPO}:odc${ODC_VER}${NBK_OUT_IMG_VER}
+NBK_BASE_IMG_REPO_DRONE_PAPER?=jcrattzama/odc_drone_paper_notebooks
+NBK_BASE_IMG_VER_DRONE_PAPER?=
+export NBK_BASE_IMG_DRONE_PAPER?=${NBK_BASE_IMG_REPO_DRONE_PAPER}:odc${ODC_VER}${NBK_BASE_IMG_VER_DRONE_PAPER}
+# _drone_paper
+# NBK_OUT_IMG_REPO?=jcrattzama/odc_training_notebooks
+# NBK_OUT_IMG_VER?=
+# export NBK_OUT_IMG?=${NBK_OUT_IMG_REPO}:odc${ODC_VER}${NBK_OUT_IMG_VER}
+export NBK_OUT_IMG?=${NBK_BASE_IMG}_platform
 ## End Notebooks ##
 
 ## Indexer ##
-IDXR_BASE_IMG_REPO?=jcrattzama/odc_manual_indexer
-IDXR_BASE_IMG_VER?=
-export IDXR_BASE_IMG?=${IDXR_BASE_IMG_REPO}:odc${ODC_VER}${IDXR_BASE_IMG_VER}
+# IDXR_BASE_IMG_REPO?=jcrattzama/odc_manual_indexer
+# IDXR_BASE_IMG_VER?=
+# export IDXR_BASE_IMG?=${IDXR_BASE_IMG_REPO}:odc${ODC_VER}${IDXR_BASE_IMG_VER}
 IDXR_INIT_BASE_IMG_REPO?=jcrattzama/manual_indexer_init
 IDXR_INIT_BASE_IMG_VER?=
-export IDXR_INIT_BASE_IMG?=${IDXR_INIT_BASE_IMG_REPO}:odc${ODC_VER}${IDXR_INIT_BASE_IMG_VER}
+export IDXR_INIT_BASE_IMG_DRONE_PAPER?=${IDXR_INIT_BASE_IMG_REPO}:odc${ODC_VER}_drone_paper${IDXR_INIT_BASE_IMG_VER}
 ## End Indexer ##
 
 ## Database ##
 export DB_BASE_IMG?=postgres:10-alpine
-export ODC_DB_HOSTNAME=odc_training_db
+export ODC_DB_HOSTNAME=odc_db
 export ODC_DB_DATABASE=datacube
 export ODC_DB_USER=dc_user
 export ODC_DB_PASSWORD=localuser1234
 export ODC_DB_PORT=5432
 ## End Database ##
 
-COMMON_EXPRTS=export NBK_BASE_IMG=${NBK_BASE_IMG}; export NBK_OUT_IMG=${NBK_OUT_IMG}; \
-			  export DB_BASE_IMG=${DB_BASE_IMG}; export DB_OUT_IMG=${DB_OUT_IMG}
+COMMON_EXPRTS=export DB_BASE_IMG=${DB_BASE_IMG}; 
+
 eval ${COMMON_EXPRTS}
 
+DRONE_PAPER_ENV_EXPRTS= \
+	export NBK_BASE_IMG=${NBK_BASE_IMG_DRONE_PAPER}; \
+	export IDXR_INIT_BASE_IMG=${IDXR_INIT_BASE_IMG_DRONE_PAPER}
+
 ## Common ##
-build:
-	$(docker_compose) build
+### Drone Paper Environment ##
+drone-paper-build:
+	${DRONE_PAPER_ENV_EXPRTS}; $(docker_compose) build
 
 # Start the notebooks environment
-up:
-	$(docker_compose) up -d --build
+drone-paper-up:
+	${DRONE_PAPER_ENV_EXPRTS}; $(docker_compose) up -d --build
 
 # Start without rebuilding the Docker image
 # (use when dependencies have not changed for faster starts).
-up-no-build:
-	$(docker_compose) up -d
+drone-paper-up-no-build:
+	${DRONE_PAPER_ENV_EXPRTS}; $(docker_compose) up -d
 
 # Stop the notebooks environment
-down:
-	$(docker_compose) stop
+drone-paper-down:
+	${DRONE_PAPER_ENV_EXPRTS}; $(docker_compose) down --remove-orphans
 
-restart: down up
+drone-paper-restart: drone-paper-down drone-paper-up
 
-restart-no-build: down up-no-build
+drone-paper-restart-no-build: drone-paper-down drone-paper-up-no-build
+### End Drone Paper Environment ##
 
 # List the running containers.
 ps:
@@ -88,29 +96,30 @@ indexer-ssh:
 
 ## Database ##
 db-ssh:
-	$(docker_compose) exec odc_training_db bash
+	$(docker_compose) exec odc_db bash
 
 # Create the persistent volume for the ODC database.
 create-odc-db-volume:
-	docker volume create odc-training-db-vol
+	docker volume create odc-platform-db-vol
 
 # Delete the persistent volume for the ODC database.
 delete-odc-db-volume:
-	docker volume rm odc-training-db-vol
+	docker volume rm odc-platform-db-vol
 
 recreate-odc-db-volume: delete-odc-db-volume create-odc-db-volume
 
 start-odc-db:
-	docker start docker_odc_training_db_1
+	docker start docker_odc_db_1
 
 stop-odc-db:
-	docker stop docker_odc_training_db_1
+	docker stop docker_odc_db_1
 
 restart-odc-db: stop-odc-db start-odc-db
 
 recreate-odc-db-and-vol: down dkr-sys-prune recreate-odc-db-volume up-no-build
 
 restore-db:
+	echo ${IDXR_INIT_BASE_IMG_DRONE_PAPER}
 #	Restore index database
 	$(docker_compose) exec indexer conda run -n odc bash -c \
 	  "gzip -dkf db_dump.gz"
@@ -126,7 +135,13 @@ restore-db:
 	  "rm db_dump.gz"
 #	Restore data
 	$(docker_compose) exec indexer conda run -n odc bash -c \
-	  "tar -xzf /Datacube/data.tar.gz -C /Datacube/data"
+	  "mkdir /Datacube/data; \
+	   tar -xzf /Datacube/data.tar.gz -C /Datacube/data"
+##	Copy data from the indexer container to the notebooks container.
+	mkdir -p tmp
+	docker cp docker_indexer_1:/Datacube/data tmp
+	docker cp tmp docker_notebooks_1:/Datacube/data
+	docker commit docker_notebooks_1 ${NBK_OUT_IMG}
 ## End Database ##
 
 ## Misc ##

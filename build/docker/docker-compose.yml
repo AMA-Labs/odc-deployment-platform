@@ -10,7 +10,7 @@ services:
         - NOTEBOOK_ROOT=${NOTEBOOK_ROOT}
     environment:
       NBK_SERVER_PASSWORD: ${NBK_SERVER_PASSWORD}
-      ODC_DB_HOSTNAME: odc_training_db
+      ODC_DB_HOSTNAME: odc_db
       ODC_DB_DATABASE: ${ODC_DB_DATABASE}
       ODC_DB_USER: ${ODC_DB_USER}
       ODC_DB_PASSWORD: ${ODC_DB_PASSWORD}
@@ -27,14 +27,14 @@ services:
   indexer:
     image: ${IDXR_INIT_BASE_IMG}
     environment:
-      ODC_DB_HOSTNAME: odc_training_db
+      ODC_DB_HOSTNAME: odc_db
       ODC_DB_DATABASE: ${ODC_DB_DATABASE}
       ODC_DB_USER: ${ODC_DB_USER}
       ODC_DB_PASSWORD: ${ODC_DB_PASSWORD}
       ODC_DB_PORT: ${ODC_DB_PORT}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-  odc_training_db:
+  odc_db:
     image: ${DB_BASE_IMG}
     environment:
       - POSTGRES_DB=${ODC_DB_DATABASE}
@@ -42,7 +42,7 @@ services:
       - POSTGRES_PASSWORD=${ODC_DB_PASSWORD}
       - N=1000
     volumes:
-      - odc-training-db-vol:/var/lib/postgresql/data
+      - odc-platform-db-vol:/var/lib/postgresql/data
 volumes:
-  odc-training-db-vol:
+  odc-platform-db-vol:
     external: true

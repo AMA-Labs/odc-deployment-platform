@@ -1,8 +1,12 @@
-# Open Data Cube Training
+| :warning:  Warning   |
+|:---------------------|
+| This environment is currently inoperable. We will remove this notice when the problems have been resolved. |
 
-The AMA ([Analytical Mechanics Associates](https://www.ama-inc.com/)) Open Data Cube Training environment is a [Jupyter Notebook Environment](https://jupyter.org/) that uses the [Open Data Cube](https://www.opendatacube.org/) to analyze satellite data.
+# Open Data Cube Platform
 
-Each user should receive their own exclusive (not shared) training environment. Each user's server will be created from a clone of this repository.
+The AMA ([Analytical Mechanics Associates](https://www.ama-inc.com/)) Open Data Cube Platform is a [Jupyter Notebook](https://jupyter.org/) environment that uses the [Open Data Cube](https://www.opendatacube.org/) to analyze satellite data.
+
+Each user should receive their own exclusive (not shared) environment. Each user's server will be created from a clone of this repository.
 
 ## Contents
 
@@ -13,7 +17,7 @@ Each user should receive their own exclusive (not shared) training environment. 
 
 ## <a name="start-env"></a> Starting the Environment
 
-First, ensure you are running in a Linux environment. 
+First, ensure you are running in a Linux environment.
 
 Next, ensure you can run the `make` command. For Ubuntu, you can run `apt-get install build-essential` to install Make.
 
@@ -22,7 +26,7 @@ In `build/docker/.env`, you can change `HOST_PORT` and `NBK_SERVER_PASSWORD` to 
 
 Now run this command to initialize the environment:
 
-`make create-odc-db-volume up restore-db`
+`make create-odc-db-volume drone-paper-up restore-db`
 
 This may take several minutes. Most of this time is spent restoring the index database.
 
@@ -32,11 +36,11 @@ Enter the string specified in `NBK_SERVER_PASSWORD` in the "Password or token" f
 
 ## <a name="run-env"></a> Running the Environment
 
-To start the environment, run `make up`.
+To start the environment, run `make drone-paper-up`.
 
-To stop the environment, run `make down`.
+To stop the environment, run `make drone-paper-down`.
 
-To restart the environment, run `make restart` (same as `make down up` or `make down; make up`).
+To restart the environment, run `make drone-paper-restart` (same as `make drone-paper-down drone-paper-up` or `make drone-paper-down; make drone-paper-up`).
 
 To check if the environment is running, run `make ps`.
 

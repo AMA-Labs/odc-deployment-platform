@@ -1,6 +1,10 @@
 ARG BASE_IMG
-FROM ${BASE_IMG}
+FROM $BASE_IMG
 
-# RUN pip3 install jupyterlab
+USER root
 
+# Create the /Datacube directory 
+RUN mkdir /Datacube
+RUN chown -R jovyan /Datacube
 
+USER jovyan
