@@ -15,13 +15,15 @@ Each user should receive their own exclusive (not shared) environment. Each user
 
 First, ensure you are running in a Linux environment.
 
-Next, ensure you can run the `make` command. For Ubuntu, you can run `sudo apt-get update -y; sudo apt-get install build-essential` to install Make.
+Next, ensure you can run the `make` command. For Ubuntu, you can run `sudo apt-get update -y; sudo apt-get install build-essential -y` to install Make. If you are not on Ubuntu, you should be able to install Docker following [these instructions](https://docs.docker.com/engine/install/) and Docker Compose following [these instructions](https://docs.docker.com/compose/install/).
 
 Now you need to install Docker and Docker Compose. On Ubuntu, you can run this command to install both:
 `make sudo-ubuntu-install-docker`
 
 Now you can change some settings before starting the environment:
 In `build/docker/.env`, you can change `HOST_PORT` and `NBK_SERVER_PASSWORD` to values you like - with `HOST_PORT` being the port to run the notebook server on and `NBK_SERVER_PASSWORD` being the password.
+
+If you want to load remote data, you will need to set the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables in the terminal context that will run this environment so the environment can see them. If the environment is already running, you will need to run the `restart` command for it to see your AWS credentials.
 
 Now run this command to initialize the environment:
 
