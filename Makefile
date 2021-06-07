@@ -1,20 +1,6 @@
 SHELL:=/bin/bash
 docker_compose = docker-compose --project-directory build/docker -f build/docker/docker-compose.yml
 
-# Make the environment variables of the environment available here.
-# include build/docker/dev/.env
-# include build/docker/odc_db_restore/.env
-# DEV_EXPRTS = "$(cat build/docker/dev/.env)"
-# ODC_DB_RESTORE_EXPRTS = "$(cat build/docker/odc_db_restore/.env)"
-# DEV_EXPRTS = "export $$(cat build/docker/dev/.env)"
-# ODC_DB_RESTORE_EXPRTS = "export $$(cat build/docker/odc_db_restore/.env)"
-# DEV_EXPRTS = "export $$(cat build/docker/dev/.env)"
-# ODC_DB_RESTORE_EXPRTS = "export $$(cat build/docker/odc_db_restore/.env)"
-# DEV_EXPRTS = "export $$(cat build/docker/dev/.env | xargs)"
-# ODC_DB_RESTORE_EXPRTS = "export $$(cat build/docker/odc_db_restore/.env | xargs)"
-# DEV_EXPRTS = "source build/docker/dev/.env"
-# ODC_DB_RESTORE_EXPRTS = "source build/docker/odc_db_restore/.env"
-
 ODC_VER?=1.8.3
 
 ## Notebooks ##
@@ -171,6 +157,19 @@ restore-db:
 ## End Database ##
 
 ## Misc ##
+sudo-ubuntu-install-docker:
+	sudo apt-get update
+	sudo apt install -y docker.io
+	sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-Linux-x86_64" -o /usr/local/bin/docker-compose
+	sudo chmod +x /usr/local/bin/docker-compose
+	sudo systemctl start docker
+	sudo systemctl enable docker
+	# The following steps are for enabling use 
+	# of the `docker` command for the current user
+	# without using `sudo`
+	getent group docker || sudo groupadd docker
+	sudo usermod -aG docker ${USER}
+
 dkr-sys-prune:
 	yes | docker system prune
 ## End Misc ##

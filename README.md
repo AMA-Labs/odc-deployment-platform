@@ -15,7 +15,10 @@ Each user should receive their own exclusive (not shared) environment. Each user
 
 First, ensure you are running in a Linux environment.
 
-Next, ensure you can run the `make` command. For Ubuntu, you can run `apt-get install build-essential` to install Make.
+Next, ensure you can run the `make` command. For Ubuntu, you can run `sudo apt-get update -y; sudo apt-get install build-essential` to install Make.
+
+Now you need to install Docker and Docker Compose. On Ubuntu, you can run this command to install both:
+`make sudo-ubuntu-install-docker`
 
 Now you can change some settings before starting the environment:
 In `build/docker/.env`, you can change `HOST_PORT` and `NBK_SERVER_PASSWORD` to values you like - with `HOST_PORT` being the port to run the notebook server on and `NBK_SERVER_PASSWORD` being the password.
@@ -24,7 +27,12 @@ Now run this command to initialize the environment:
 
 `make <env-prefix>-full-init`
 
-Where `<env-prefix>` is the prefix for the environment, like `drone-paper` for the IGARSS 2021 drone data ODC pipeline paper (titled "An End-to-end Pipeline for Acquiring, Processing, and Importing UAS Data for Use in the Open Data Cube (ODC)"). You can examine the `Makefile` for available environments.
+Where `<env-prefix>` is the prefix for the environment, like `drone-paper` for the IGARSS 2021 drone data ODC pipeline paper (titled "An End-to-end Pipeline for Acquiring, Processing, and Importing UAS Data for Use in the Open Data Cube (ODC)"). You can examine the `Makefile` for available environments. Currently they are:
+
+* `drone-paper`
+
+So for example, `make drone-paper-full-init` will deploy the 
+drone environment.
 
 This may take a few minutes. Most of this time is spent restoring the index database.
 
