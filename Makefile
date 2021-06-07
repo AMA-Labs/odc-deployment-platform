@@ -88,6 +88,10 @@ drone-paper-docker-commit:
 	docker commit docker_notebooks_1 ${NBK_OUT_IMG_DRONE_PAPER}
 
 drone-paper-restore-db: restore-db drone-paper-docker-commit
+
+drone-paper-full-init: create-odc-db-volume create-notebook-volume drone-paper-up drone-paper-restore-db
+
+drone-paper-full-down: drone-paper-down delete-odc-db-volume delete-notebook-volume
 ### End Drone Paper Environment ##
 
 # List the running containers.
@@ -99,6 +103,16 @@ ps:
 # Start an interactive shell to the notebooks container.
 notebooks-ssh:
 	$(docker_compose) exec notebooks bash
+
+# Create the persistent volume for the ODC database.
+create-notebook-volume:
+	docker volume create odc-platform-notebook-vol
+
+# Delete the persistent volume for the ODC database.
+delete-notebook-volume:
+	docker volume rm odc-platform-notebook-vol
+
+recreate-notebook-volume: delete-notebook-volume create-notebook-volume
 ## End Notebooks ##
 
 ## Indexer ##

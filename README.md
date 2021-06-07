@@ -1,7 +1,3 @@
-| :warning:  Warning   |
-|:---------------------|
-| This environment is currently inoperable. We will remove this notice when the problems have been resolved. |
-
 # Open Data Cube Platform
 
 The AMA ([Analytical Mechanics Associates](https://www.ama-inc.com/)) Open Data Cube Platform is a [Jupyter Notebook](https://jupyter.org/) environment that uses the [Open Data Cube](https://www.opendatacube.org/) to analyze satellite data.
@@ -12,7 +8,7 @@ Each user should receive their own exclusive (not shared) environment. Each user
 
 * [Starting the Environment](#start-env)
 * [Running the Environment](#run-env)
-* [Training Plan](#train-plan)
+* [Deleting the Environment](#delete-env)
 <br><br>
 
 ## <a name="start-env"></a> Starting the Environment
@@ -26,7 +22,7 @@ In `build/docker/.env`, you can change `HOST_PORT` and `NBK_SERVER_PASSWORD` to 
 
 Now run this command to initialize the environment:
 
-`make create-odc-db-volume <env-prefix>-up <env-prefix>-restore-db`
+`make <env-prefix>-full-init`
 
 Where `<env-prefix>` is the prefix for the environment, like `drone-paper` for the IGARSS 2021 drone data ODC pipeline paper (titled "An End-to-end Pipeline for Acquiring, Processing, and Importing UAS Data for Use in the Open Data Cube (ODC)"). You can examine the `Makefile` for available environments.
 
@@ -36,7 +32,7 @@ Once the preceding command completes, try connecting to the notebook server at `
 
 Enter the string specified in `NBK_SERVER_PASSWORD` in the "Password or token" field at the top of the page and then click the "Log in" button to the right of it.
 
-## <a name="run-env"></a> Running the Environment
+## <a name="stop-env"></a> Running the Environment
 
 To start the environment, run `make <env-prefix>-up`.
 
@@ -52,5 +48,12 @@ To connect to the indexer container through a bash shell, run `make indexer-ssh`
 
 To connect to the database container through a bash shell, run `make db-ssh`.
 
-## <a name="train-plan"></a> Training Plan
+## <a name="delete-env"></a> Deleting the Environment
 
+When you are fully done with the environment, including all content in it, run this command to remove everything in it.
+
+`make <env-prefix>-full-down`
+
+| :warning:  Warning   |
+|:---------------------|
+| Any content you have in your environment will be permanently deleted after running this comment. This includes any indexed data and any filesystem state in the notebook server, including notebooks. |
