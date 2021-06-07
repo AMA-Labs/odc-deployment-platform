@@ -25,7 +25,10 @@ export NBK_BASE_IMG_DRONE_PAPER?=${NBK_BASE_IMG_REPO_DRONE_PAPER}:odc${ODC_VER}$
 # NBK_OUT_IMG_REPO?=jcrattzama/odc_training_notebooks
 # NBK_OUT_IMG_VER?=
 # export NBK_OUT_IMG?=${NBK_OUT_IMG_REPO}:odc${ODC_VER}${NBK_OUT_IMG_VER}
-export NBK_OUT_IMG?=${NBK_BASE_IMG}_platform
+NBK_OUT_IMG_BASE?=jcrattzama/odc_platform_notebooks
+NBK_OUT_IMG_VER_DRONE_PAPER?=
+export NBK_OUT_IMG_DRONE_PAPER?=${NBK_OUT_IMG_BASE}:drone_paper${NBK_OUT_IMG_VER_DRONE_PAPER}
+# ${NBK_BASE_IMG_DRONE_PAPER}_platform
 ## End Notebooks ##
 
 ## Indexer ##
@@ -52,10 +55,15 @@ eval ${COMMON_EXPRTS}
 
 DRONE_PAPER_ENV_EXPRTS= \
 	export NBK_BASE_IMG=${NBK_BASE_IMG_DRONE_PAPER}; \
+	export NBK_OUT_IMG=${NBK_OUT_IMG_DRONE_PAPER}; \
 	export IDXR_INIT_BASE_IMG=${IDXR_INIT_BASE_IMG_DRONE_PAPER}
 
 ## Common ##
+
 ### Drone Paper Environment ##
+drone-paper-config:
+	${DRONE_PAPER_ENV_EXPRTS}; $(docker_compose) config
+
 drone-paper-build:
 	${DRONE_PAPER_ENV_EXPRTS}; $(docker_compose) build
 
@@ -75,6 +83,11 @@ drone-paper-down:
 drone-paper-restart: drone-paper-down drone-paper-up
 
 drone-paper-restart-no-build: drone-paper-down drone-paper-up-no-build
+
+drone-paper-docker-commit:
+	docker commit docker_notebooks_1 ${NBK_OUT_IMG_DRONE_PAPER}
+
+drone-paper-restore-db: restore-db drone-paper-docker-commit
 ### End Drone Paper Environment ##
 
 # List the running containers.
@@ -119,7 +132,6 @@ restart-odc-db: stop-odc-db start-odc-db
 recreate-odc-db-and-vol: down dkr-sys-prune recreate-odc-db-volume up-no-build
 
 restore-db:
-	echo ${IDXR_INIT_BASE_IMG_DRONE_PAPER}
 #	Restore index database
 	$(docker_compose) exec indexer conda run -n odc bash -c \
 	  "gzip -dkf db_dump.gz"
@@ -133,15 +145,15 @@ restore-db:
          -U ${ODC_DB_USER} ${ODC_DB_DATABASE} < db_dump &> restore.txt"
 	$(docker_compose) exec indexer conda run -n odc bash -c \
 	  "rm db_dump.gz"
-#	Restore data
-	$(docker_compose) exec indexer conda run -n odc bash -c \
+#	Copy compressed data from the indexer container to the 
+#   notebooks container and decompress it.
+	mkdir -p tmp
+	docker cp docker_indexer_1:/Datacube/data.tar.gz tmp
+	docker cp tmp/data.tar.gz docker_notebooks_1:/Datacube/data.tar.gz
+	$(docker_compose) exec notebooks bash -c \
 	  "mkdir /Datacube/data; \
 	   tar -xzf /Datacube/data.tar.gz -C /Datacube/data"
-##	Copy data from the indexer container to the notebooks container.
-	mkdir -p tmp
-	docker cp docker_indexer_1:/Datacube/data tmp
-	docker cp tmp docker_notebooks_1:/Datacube/data
-	docker commit docker_notebooks_1 ${NBK_OUT_IMG}
+	rm -rf tmp
 ## End Database ##
 
 ## Misc ##
