@@ -6,8 +6,7 @@ services:
       context: ${DKR_CMP_CONTEXT}
       dockerfile: build/docker/Dockerfile
       args:
-        - BASE_IMG=${NBK_BASE_IMG}
-        - NOTEBOOK_ROOT=${NOTEBOOK_ROOT}
+        BASE_IMG: ${NBK_BASE_IMG}
     environment:
       NBK_SERVER_PASSWORD: ${NBK_SERVER_PASSWORD}
       ODC_DB_HOSTNAME: odc_db
@@ -21,8 +20,6 @@ services:
     ports:
       # 8888 is the Jupyter notebook default port
       - ${HOST_PORT}:8888
-    volumes:
-      - ${DKR_CMP_CONTEXT}/notebooks:${NOTEBOOK_ROOT}
     restart: "no"
   indexer:
     image: ${IDXR_INIT_BASE_IMG}
@@ -37,10 +34,10 @@ services:
   odc_db:
     image: ${DB_BASE_IMG}
     environment:
-      - POSTGRES_DB=${ODC_DB_DATABASE}
-      - POSTGRES_USER=${ODC_DB_USER}
-      - POSTGRES_PASSWORD=${ODC_DB_PASSWORD}
-      - N=1000
+      POSTGRES_DB: ${ODC_DB_DATABASE}
+      POSTGRES_USER: ${ODC_DB_USER}
+      POSTGRES_PASSWORD: ${ODC_DB_PASSWORD}
+      N: 1000
     volumes:
       - odc-platform-db-vol:/var/lib/postgresql/data
 volumes:

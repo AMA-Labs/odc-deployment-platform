@@ -26,9 +26,11 @@ In `build/docker/.env`, you can change `HOST_PORT` and `NBK_SERVER_PASSWORD` to 
 
 Now run this command to initialize the environment:
 
-`make create-odc-db-volume drone-paper-up restore-db`
+`make create-odc-db-volume <env-prefix>-up <env-prefix>-restore-db`
 
-This may take several minutes. Most of this time is spent restoring the index database.
+Where `<env-prefix>` is the prefix for the environment, like `drone-paper` for the IGARSS 2021 drone data ODC pipeline paper (titled "An End-to-end Pipeline for Acquiring, Processing, and Importing UAS Data for Use in the Open Data Cube (ODC)"). You can examine the `Makefile` for available environments.
+
+This may take a few minutes. Most of this time is spent restoring the index database.
 
 Once the preceding command completes, try connecting to the notebook server at `localhost:{HOST_PORT}`. By default, that should be `localhost:8081`.
 
@@ -36,11 +38,11 @@ Enter the string specified in `NBK_SERVER_PASSWORD` in the "Password or token" f
 
 ## <a name="run-env"></a> Running the Environment
 
-To start the environment, run `make drone-paper-up`.
+To start the environment, run `make <env-prefix>-up`.
 
-To stop the environment, run `make drone-paper-down`.
+To stop the environment, run `make <env-prefix>-down`.
 
-To restart the environment, run `make drone-paper-restart` (same as `make drone-paper-down drone-paper-up` or `make drone-paper-down; make drone-paper-up`).
+To restart the environment, run `make <env-prefix>-restart` (same as `make <env-prefix>-down <env-prefix>-up` or `make <env-prefix>-down; make <env-prefix>-up`).
 
 To check if the environment is running, run `make ps`.
 
