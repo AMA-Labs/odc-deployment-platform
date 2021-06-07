@@ -66,4 +66,4 @@ When you are fully done with the environment, including all content in it, run t
 
 | :warning:  Warning   |
 |:---------------------|
-| Any content you have in your environment will be permanently deleted after running this comment. This includes any indexed data and any filesystem state in the notebook server, including notebooks. |
+| Any content you have in your environment will be permanently deleted after running this command. This includes any indexed data and any filesystem state in the notebook server, including notebooks. |
