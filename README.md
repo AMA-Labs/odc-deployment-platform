@@ -32,6 +32,7 @@ Now run this command to initialize the environment:
 Where `<env-prefix>` is the prefix for the environment, like `drone-paper` for the IGARSS 2021 drone data ODC pipeline paper (titled "An End-to-end Pipeline for Acquiring, Processing, and Importing UAS Data for Use in the Open Data Cube (ODC)"). You can examine the `Makefile` for available environments. Currently they are:
 
 * `drone-paper`
+* `odc-training`
 
 So for example, `make drone-paper-full-init` will deploy the 
 drone environment.
