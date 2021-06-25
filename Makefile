@@ -29,7 +29,7 @@ export NBK_OUT_IMG_ODC_TRAINING?=${NBK_OUT_IMG_BASE}:odc_training${NBK_OUT_IMG_V
 IDXR_INIT_BASE_IMG_REPO?=jcrattzama/manual_indexer_init
 IDXR_INIT_BASE_IMG_VER?=
 export IDXR_INIT_BASE_IMG_DRONE_PAPER?=${IDXR_INIT_BASE_IMG_REPO}:odc${ODC_VER}_drone_paper${IDXR_INIT_BASE_IMG_VER}
-export IDXR_INIT_BASE_IMG_ODC_TRAINING?=${IDXR_INIT_BASE_IMG_REPO}:odc${ODC_VER}__ls5_7_8_c2l2_US${IDXR_INIT_BASE_IMG_VER}
+export IDXR_INIT_BASE_IMG_ODC_TRAINING?=${IDXR_INIT_BASE_IMG_REPO}:odc${ODC_VER}__cdc_training${IDXR_INIT_BASE_IMG_VER}
 ## End Indexer ##
 
 ## Database ##
@@ -118,12 +118,12 @@ odc-training-restart-no-build: odc-training-down odc-training-up-no-build
 odc-training-docker-commit:
 	docker commit docker_notebooks_1 ${NBK_OUT_IMG_ODC_TRAINING}
 
-odc-training-restore-db: restore-db odc-training-docker-commit
+odc-training-restore-db: restore-db restore-local-data odc-training-docker-commit
 
 odc-training-full-init: create-odc-db-volume create-notebook-volume odc-training-up odc-training-restore-db
 
 odc-training-full-down: odc-training-down delete-odc-db-volume delete-notebook-volume
-### End ODC Training Environment ##
+## End ODC Training Environment ##
 
 # List the running containers.
 ps:
@@ -199,7 +199,8 @@ restore-local-data:
 	docker cp tmp/data.tar.gz docker_notebooks_1:/Datacube/data.tar.gz
 	$(docker_compose) exec notebooks bash -c \
 	  "mkdir /Datacube/data; \
-	   tar -xzf /Datacube/data.tar.gz -C /Datacube/data"
+	   tar -xzf /Datacube/data.tar.gz -C /Datacube/data; \
+	   rm /Datacube/data.tar.gz"
 	rm -rf tmp
 ## End Database ##
 
