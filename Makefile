@@ -19,8 +19,17 @@ NBK_BASE_IMG_VER_ODC_TRAINING?=
 export NBK_BASE_IMG_ODC_TRAINING?=${NBK_BASE_IMG_REPO_ODC_TRAINING}:odc${ODC_VER}${NBK_BASE_IMG_VER_ODC_TRAINING}
 NBK_OUT_IMG_BASE?=jcrattzama/odc_platform_notebooks
 NBK_OUT_IMG_VER_ODC_TRAINING?=
-export NBK_OUT_IMG_ODC_TRAINING?=${NBK_OUT_IMG_BASE}:odc_training${NBK_OUT_IMG_VER_DRONE_PAPER}
+export NBK_OUT_IMG_ODC_TRAINING?=${NBK_OUT_IMG_BASE}:odc_training${NBK_OUT_IMG_VER_ODC_TRAINING}
 ### End ODC Training ###
+
+### Google Earth Engine ###
+NBK_BASE_IMG_REPO_GEE?=jcrattzama/odc_gee_notebooks
+NBK_BASE_IMG_VER_GEE?=
+export NBK_BASE_IMG_GEE?=${NBK_BASE_IMG_REPO_GEE}:odc${ODC_VER}${NBK_BASE_IMG_VER_GEE}
+NBK_OUT_IMG_BASE?=jcrattzama/odc_platform_notebooks
+NBK_OUT_IMG_VER_GEE?=
+export NBK_OUT_IMG_GEE?=${NBK_OUT_IMG_BASE}:odc_training${NBK_OUT_IMG_VER_GEE}
+### End Google Earth Engine ###
 ## End Notebooks ##
 
 ## Indexer ##
@@ -30,6 +39,7 @@ IDXR_INIT_BASE_IMG_REPO?=jcrattzama/manual_indexer_init
 IDXR_INIT_BASE_IMG_VER?=
 export IDXR_INIT_BASE_IMG_DRONE_PAPER?=${IDXR_INIT_BASE_IMG_REPO}:odc${ODC_VER}_drone_paper${IDXR_INIT_BASE_IMG_VER}
 export IDXR_INIT_BASE_IMG_ODC_TRAINING?=${IDXR_INIT_BASE_IMG_REPO}:odc${ODC_VER}__cdc_training${IDXR_INIT_BASE_IMG_VER}
+export IDXR_INIT_BASE_IMG_GEE?=${IDXR_INIT_BASE_IMG_REPO}:odc${ODC_VER}__cdc_training${IDXR_INIT_BASE_IMG_VER}
 ## End Indexer ##
 
 ## Database ##
@@ -54,6 +64,11 @@ ODC_TRAINING_ENV_EXPRTS= \
 	export NBK_BASE_IMG=${NBK_BASE_IMG_ODC_TRAINING}; \
 	export NBK_OUT_IMG=${NBK_OUT_IMG_ODC_TRAINING}; \
 	export IDXR_INIT_BASE_IMG=${IDXR_INIT_BASE_IMG_ODC_TRAINING}
+
+GEE_ENV_EXPRTS= \
+	export NBK_BASE_IMG=${NBK_BASE_IMG_GEE}; \
+	export NBK_OUT_IMG=${NBK_OUT_IMG_GEE}; \
+	export IDXR_INIT_BASE_IMG=${IDXR_INIT_BASE_IMG_GEE}
 
 ## Common ##
 
@@ -124,6 +139,40 @@ odc-training-full-init: create-odc-db-volume create-notebook-volume odc-training
 
 odc-training-full-down: odc-training-down delete-odc-db-volume delete-notebook-volume
 ## End ODC Training Environment ##
+
+### Google Earth Engine Environment ##
+gee-config:
+	${GEE_ENV_EXPRTS}; $(docker_compose) config
+
+gee-build:
+	${GEE_ENV_EXPRTS}; $(docker_compose) build
+
+# Start the notebooks environment
+gee-up:
+	${GEE_ENV_EXPRTS}; $(docker_compose) up -d --build
+
+# Start without rebuilding the Docker image
+# (use when dependencies have not changed for faster starts).
+gee-up-no-build:
+	${GEE_ENV_EXPRTS}; $(docker_compose) up -d
+
+# Stop the notebooks environment
+gee-down:
+	${GEE_ENV_EXPRTS}; $(docker_compose) down --remove-orphans
+
+gee-restart: gee-down gee-up
+
+gee-restart-no-build: gee-down gee-up-no-build
+
+gee-docker-commit:
+	docker commit docker_notebooks_1 ${NBK_OUT_IMG_GEE}
+
+gee-restore-db: restore-db restore-local-data gee-docker-commit
+
+gee-full-init: create-odc-db-volume create-notebook-volume gee-up gee-restore-db
+
+gee-full-down: gee-down delete-odc-db-volume delete-notebook-volume
+## End Google Earth Engine Environment ##
 
 # List the running containers.
 ps:
