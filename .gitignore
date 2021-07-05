@@ -12,3 +12,4 @@ __pycache__
 **/tmp
 **/output
 **/.env
+odc_gee/config

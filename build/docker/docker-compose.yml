@@ -19,6 +19,7 @@ services:
       AWS_REQUEST_PAYER: requester
     volumes:
       - odc-platform-notebook-vol:${ROOT_DIR}
+      - ${DKR_CMP_CONTEXT}/odc_gee/config:/home/jovyan/.config/odc-gee:ro
     ports:
       # 8888 is the Jupyter notebook default port
       - ${HOST_PORT}:8888
