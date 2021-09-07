@@ -1,5 +1,8 @@
 SHELL:=/bin/bash
-docker_compose = docker-compose --project-directory build/docker -f build/docker/docker-compose.yml
+# Set the project name to the path - making underscore the path separator.
+PWD=$(pwd)
+project_name=$(shell echo $${PWD//\//_})
+docker_compose = docker-compose --project-directory build/docker -f build/docker/docker-compose.yml -p $(project_name)
 
 ODC_VER?=1.8.3
 
@@ -39,7 +42,7 @@ IDXR_INIT_BASE_IMG_REPO?=jcrattzama/manual_indexer_init
 IDXR_INIT_BASE_IMG_VER?=
 export IDXR_INIT_BASE_IMG_DRONE_PAPER?=${IDXR_INIT_BASE_IMG_REPO}:odc${ODC_VER}_drone_paper${IDXR_INIT_BASE_IMG_VER}
 export IDXR_INIT_BASE_IMG_ODC_TRAINING?=${IDXR_INIT_BASE_IMG_REPO}:odc${ODC_VER}__cdc_training${IDXR_INIT_BASE_IMG_VER}
-export IDXR_INIT_BASE_IMG_VA_CUBE?=${IDXR_INIT_BASE_IMG_REPO}:odc${ODC_VER}__ls5_7_8_c2l2_va${IDXR_INIT_BASE_IMG_VER}
+export IDXR_INIT_BASE_IMG_VA_CUBE?=${IDXR_INIT_BASE_IMG_REPO}:odc${ODC_VER}__va_cube${IDXR_INIT_BASE_IMG_VER}
 ## End Indexer ##
 
 ## Database ##
