@@ -75,7 +75,7 @@ VA_CUBE_ENV_EXPRTS= \
 
 ## Common ##
 
-### Drone Paper Environment ##
+### Drone Paper Environment ###
 drone-paper-config:
 	${DRONE_PAPER_ENV_EXPRTS}; $(docker_compose) config
 
@@ -107,9 +107,9 @@ drone-paper-restore-db: restore-db restore-local-data drone-paper-docker-commit
 drone-paper-full-init: create-odc-db-volume create-notebook-volume drone-paper-up drone-paper-restore-db
 
 drone-paper-full-down: drone-paper-down delete-odc-db-volume delete-notebook-volume
-### End Drone Paper Environment ##
+### End Drone Paper Environment ###
 
-### ODC Training Environment ##
+### ODC Training Environment ###
 odc-training-config:
 	${ODC_TRAINING_ENV_EXPRTS}; $(docker_compose) config
 
@@ -141,9 +141,9 @@ odc-training-restore-db: restore-db restore-local-data odc-training-docker-commi
 odc-training-full-init: create-odc-db-volume create-notebook-volume odc-training-up odc-training-restore-db
 
 odc-training-full-down: odc-training-down delete-odc-db-volume delete-notebook-volume
-## End ODC Training Environment ##
+### End ODC Training Environment ###
 
-### Google Earth Engine Environment ##
+### Google Earth Engine Environment ###
 va-cube-config:
 	${VA_CUBE_ENV_EXPRTS}; $(docker_compose) config
 
@@ -175,7 +175,7 @@ va-cube-restore-db: restore-db va-cube-docker-commit
 va-cube-full-init: create-odc-db-volume create-notebook-volume va-cube-up va-cube-restore-db
 
 va-cube-full-down: va-cube-down delete-odc-db-volume delete-notebook-volume
-## End Google Earth Engine Environment ##
+### End Google Earth Engine Environment ###
 
 # List the running containers.
 ps:
