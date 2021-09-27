@@ -1,7 +1,8 @@
 SHELL:=/bin/bash
 # Set the project name to the path - making underscore the path separator.
+# Set the project name to the path - making underscore the path separator.
 # Remove the leading slash and use lowercase since docker-compose will.
-project_name=$(shell PWD_var=$$(pwd); PWD_no_lead_slash=$${PWD_var:1}; echo $${PWD_no_lead_slash//\//_} | awk '{print tolower($$0)}' | cat)
+export project_name=$(shell PWD_var=$$(pwd); PWD_no_lead_slash=$${PWD_var:1}; echo $${PWD_no_lead_slash//\//_} | awk '{print tolower($$0)}' | cat)
 docker_compose = docker-compose --project-directory build/docker -f build/docker/docker-compose.yml -p $(project_name)
 
 ODC_VER?=1.8.3
@@ -54,7 +55,7 @@ export ODC_DB_PASSWORD=localuser1234
 export ODC_DB_PORT=5432
 ## End Database ##
 
-COMMON_EXPRTS=export DB_BASE_IMG=${DB_BASE_IMG}; 
+COMMON_EXPRTS=export DB_BASE_IMG=${DB_BASE_IMG};
 
 eval ${COMMON_EXPRTS}
 
@@ -103,13 +104,20 @@ drone-paper-restart: drone-paper-down drone-paper-up
 drone-paper-restart-no-build: drone-paper-down drone-paper-up-no-build
 
 drone-paper-docker-commit:
-	docker commit docker_notebooks_1 ${NBK_OUT_IMG_DRONE_PAPER}
+	docker commit $(project_name)_notebooks_1 ${NBK_OUT_IMG_DRONE_PAPER}
 
 drone-paper-restore-db: restore-db restore-local-data drone-paper-docker-commit
 
 drone-paper-full-init: create-odc-db-volume create-notebook-volume drone-paper-up drone-paper-restore-db
 
 drone-paper-full-down: drone-paper-down delete-odc-db-volume delete-notebook-volume
+
+drone-paper-pull:
+	${DRONE_PAPER_ENV_EXPRTS}; $(docker_compose) pull
+
+drone-paper-push:
+	${DRONE_PAPER_ENV_EXPRTS}; $(docker_compose) push
+
 ### End Drone Paper Environment ###
 
 ### ODC Training Environment ###
@@ -140,7 +148,7 @@ odc-training-restart: odc-training-down odc-training-up
 odc-training-restart-no-build: odc-training-down odc-training-up-no-build
 
 odc-training-docker-commit:
-	docker commit docker_notebooks_1 ${NBK_OUT_IMG_ODC_TRAINING}
+	docker commit $(project_name)_notebooks_1 ${NBK_OUT_IMG_ODC_TRAINING}
 
 odc-training-restore-db: restore-db restore-local-data odc-training-docker-commit
 
@@ -177,7 +185,7 @@ va-cube-restart: va-cube-down va-cube-up
 va-cube-restart-no-build: va-cube-down va-cube-up-no-build
 
 va-cube-docker-commit:
-	docker commit docker_notebooks_1 ${NBK_OUT_IMG_VA_CUBE}
+	docker commit $(project_name)_notebooks_1 ${NBK_OUT_IMG_VA_CUBE}
 
 va-cube-restore-db: restore-db va-cube-docker-commit
 
@@ -228,10 +236,10 @@ delete-odc-db-volume:
 recreate-odc-db-volume: delete-odc-db-volume create-odc-db-volume
 
 start-odc-db:
-	docker start docker_odc_db_1
+	docker start $(project_name)_odc_db_1
 
 stop-odc-db:
-	docker stop docker_odc_db_1
+	docker stop $(project_name)_odc_db_1
 
 restart-odc-db: stop-odc-db start-odc-db
 
@@ -256,8 +264,8 @@ restore-local-data:
 #	Copy compressed data from the indexer container to the 
 #   notebooks container and decompress it.
 	mkdir -p tmp
-	docker cp docker_indexer_1:/Datacube/data.tar.gz tmp
-	docker cp tmp/data.tar.gz docker_notebooks_1:/Datacube/data.tar.gz
+	docker cp $(project_name)_indexer_1:/Datacube/data.tar.gz tmp
+	docker cp tmp/data.tar.gz $(project_name)_notebooks_1:/Datacube/data.tar.gz
 	$(docker_compose) exec notebooks bash -c \
 	  "mkdir /Datacube/data; \
 	   tar -xzf /Datacube/data.tar.gz -C /Datacube/data; \
