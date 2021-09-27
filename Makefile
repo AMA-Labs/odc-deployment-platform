@@ -1,7 +1,7 @@
 SHELL:=/bin/bash
 # Set the project name to the path - making underscore the path separator.
-PWD=$(pwd)
-project_name=$(shell echo $${PWD//\//_})
+# Remove the leading slash and use lowercase since docker-compose will.
+project_name=$(shell PWD_var=$$(pwd); PWD_no_lead_slash=$${PWD_var:1}; echo $${PWD_no_lead_slash//\//_} | awk '{print tolower($$0)}' | cat)
 docker_compose = docker-compose --project-directory build/docker -f build/docker/docker-compose.yml -p $(project_name)
 
 ODC_VER?=1.8.3
@@ -82,6 +82,9 @@ drone-paper-config:
 drone-paper-build:
 	${DRONE_PAPER_ENV_EXPRTS}; $(docker_compose) build
 
+drone-paper-build-no-cache:
+	${DRONE_PAPER_ENV_EXPRTS}; $(docker_compose) build --no-cache
+
 # Start the notebooks environment
 drone-paper-up:
 	${DRONE_PAPER_ENV_EXPRTS}; $(docker_compose) up -d --build
@@ -116,6 +119,9 @@ odc-training-config:
 odc-training-build:
 	${ODC_TRAINING_ENV_EXPRTS}; $(docker_compose) build
 
+odc-training-build-no-cache:
+	${ODC_TRAINING_ENV_EXPRTS}; $(docker_compose) build --no-cache
+
 # Start the notebooks environment
 odc-training-up:
 	${ODC_TRAINING_ENV_EXPRTS}; $(docker_compose) up -d --build
@@ -149,6 +155,9 @@ va-cube-config:
 
 va-cube-build:
 	${VA_CUBE_ENV_EXPRTS}; $(docker_compose) build
+
+va-cube-build-no-cache:
+	${VA_CUBE_ENV_EXPRTS}; $(docker_compose) build --no-cache
 
 # Start the notebooks environment
 va-cube-up:
@@ -273,3 +282,10 @@ sudo-ubuntu-install-docker:
 dkr-sys-prune:
 	yes | docker system prune
 ## End Misc ##
+
+## CI ##
+test-ci-local:
+	gitlab-runner exec shell drone-paper-build
+	gitlab-runner exec shell odc-training-build
+	gitlab-runner exec shell va-cube-build
+## End CI ##

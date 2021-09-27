@@ -1,0 +1,27 @@
+image: jcrattzama/odc-gitlab-runner
+
+stages:
+  - build
+
+drone-paper-build:
+  stage: build
+  script:
+    - make drone-paper-full-init
+    - make drone-paper-full-down
+
+odc-training-build:
+  stage: build
+  script:
+    - make odc-training-full-init
+    - make odc-training-full-down
+
+va-cube-build:
+  stage: build
+  script:
+    - make va-cube-full-init
+    - make va-cube-full-down
+
+push:
+  stage: push
+  script:
+    - make dev-push
