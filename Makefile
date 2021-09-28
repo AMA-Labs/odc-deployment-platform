@@ -247,17 +247,17 @@ recreate-odc-db-and-vol: down dkr-sys-prune recreate-odc-db-volume up-no-build
 
 restore-db:
 #	Restore index database
-	$(docker_compose) exec indexer conda run -n odc bash -c \
+	$(docker_compose) exec -T indexer conda run -n odc bash -c \
 	  "gzip -dkf db_dump.gz"
-	$(docker_compose) exec indexer conda run -n odc bash -c \
+	$(docker_compose) exec -T indexer conda run -n odc bash -c \
 	  "datacube system init"
-	$(docker_compose) exec indexer conda run -n odc bash -c \
+	$(docker_compose) exec -T indexer conda run -n odc bash -c \
 	  'PGPASSWORD=${ODC_DB_PASSWORD} psql -h ${ODC_DB_HOSTNAME} \
          -U ${ODC_DB_USER} ${ODC_DB_DATABASE} -c "DROP SCHEMA IF EXISTS agdc CASCADE;"'
-	$(docker_compose) exec indexer conda run -n odc bash -c \
+	$(docker_compose) exec -T indexer conda run -n odc bash -c \
 	  "PGPASSWORD=${ODC_DB_PASSWORD} psql -h ${ODC_DB_HOSTNAME} \
          -U ${ODC_DB_USER} ${ODC_DB_DATABASE} < db_dump &> restore.txt"
-	$(docker_compose) exec indexer conda run -n odc bash -c \
+	$(docker_compose) exec -T indexer conda run -n odc bash -c \
 	  "rm db_dump.gz"
 
 restore-local-data:
@@ -266,7 +266,7 @@ restore-local-data:
 	mkdir -p tmp
 	docker cp $(project_name)_indexer_1:/Datacube/data.tar.gz tmp
 	docker cp tmp/data.tar.gz $(project_name)_notebooks_1:/Datacube/data.tar.gz
-	$(docker_compose) exec notebooks bash -c \
+	$(docker_compose) exec -T notebooks bash -c \
 	  "mkdir /Datacube/data; \
 	   tar -xzf /Datacube/data.tar.gz -C /Datacube/data; \
 	   rm /Datacube/data.tar.gz"
