@@ -1,6 +1,6 @@
-# Open Data Cube Platform
+# Open Data Cube Deployment Platform
 
-The AMA ([Analytical Mechanics Associates](https://www.ama-inc.com/)) Open Data Cube Platform allows creation of pre-defined [JupyterLabs](https://jupyter.org/) environments that use the [Open Data Cube](https://www.opendatacube.org/) to analyze earth observation data. Each pre-defined environment is paired with an ODC index database that has some products and indexed data for those products relevant to that environment.
+The AMA ([Analytical Mechanics Associates](https://www.ama-inc.com/)) Open Data Cube Deployment Platform allows creation of pre-defined [JupyterLabs](https://jupyter.org/) environments that use the [Open Data Cube](https://www.opendatacube.org/) to analyze earth observation data. Each pre-defined environment is paired with an ODC index database that has some products and indexed data for those products relevant to that environment.
 
 Each user should receive their own exclusive (not shared) environment. Each user's server will be created from a copy of this repository.
 
